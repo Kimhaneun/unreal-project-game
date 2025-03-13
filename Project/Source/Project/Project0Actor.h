@@ -7,6 +7,7 @@
 #include "Project0Actor.generated.h"
 
 class UProject0Object;
+class UStaticMeshComponent;
 
 UCLASS()
 class PROJECT_API AProject0Actor : public AActor
@@ -25,7 +26,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected :
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UStaticMeshComponent> Box;
 
@@ -35,11 +36,19 @@ protected :
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UStaticMeshComponent> Wing;
 
+#pragma region  ACTOR MOVEMENT
+	// UPROPERTY(EditAnywherer, Category = Battle)
+	// TObjectPtr<AProject0Actor> Target;
+#pragma endregion
+
 public:
+#pragma region OBJECT CREATE WITH SMART POINTER
 	// Transfers management role to Unreal.
 	// UPROPERTY()
-	// UProject0Object* object;
-	// 
+	// UProject0Object* Object;
+#pragma endregion
+
+#pragma region ADDED UPROPERTY VARIABLES
 	// UPROPERTY(VisibleAnywhere)
 	// int32 HealthPoint = 100;
 	// 
@@ -48,4 +57,5 @@ public:
 	// 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	// float MovementSpeed = 10;
+#pragma endregion
 };

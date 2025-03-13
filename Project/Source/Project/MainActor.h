@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "MainActor.generated.h"
 
+class project0Actor;
+
 UCLASS()
 class PROJECT_API AMainActor : public AActor
 {
@@ -24,9 +26,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+#pragma region CREATE PROJECT0ACTOR
 	UPROPERTY();
 	TObjectPtr<class AProject0Actor> Project0Actor;
+#pragma endregion
 
+	// Pointer referring to the class that inherits the  Project0Actor class
 	UPROPERTY();
 	TSubclassOf<class AProject0Actor> BPProject0ActorClass;
 };

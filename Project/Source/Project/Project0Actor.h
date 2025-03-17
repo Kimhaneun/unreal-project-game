@@ -36,19 +36,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UStaticMeshComponent> Wing;
 
-#pragma region  ACTOR MOVEMENT
+#pragma region  Actor Movement
 	// UPROPERTY(EditAnywherer, Category = Battle)
 	// TObjectPtr<AProject0Actor> Target;
 #pragma endregion
 
 public:
-#pragma region OBJECT CREATE WITH SMART POINTER
+#pragma region Object create with smart pointer
 	// Transfers management role to Unreal.
 	// UPROPERTY()
 	// UProject0Object* Object;
 #pragma endregion
 
-#pragma region ADDED UPROPERTY VARIABLES
+#pragma region Added UPROPERTY variables
 	// UPROPERTY(VisibleAnywhere)
 	// int32 HealthPoint = 100;
 	// 

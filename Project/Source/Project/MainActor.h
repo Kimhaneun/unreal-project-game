@@ -26,7 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-#pragma region CREATE PROJECT0ACTOR
+#pragma region Create Project0Actor
 	UPROPERTY();
 	TObjectPtr<class AProject0Actor> Project0Actor;
 #pragma endregion

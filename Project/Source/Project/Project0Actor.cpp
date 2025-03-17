@@ -41,6 +41,7 @@ AProject0Actor::AProject0Actor()
 void AProject0Actor::BeginPlay()
 {
 	Super::BeginPlay();
+	Super::BeginPlay();
 
 #pragma region OBJECT CREATE
 	// There is a possibility of  memory leakage, and maintenance is difficult.
@@ -56,7 +57,7 @@ void AProject0Actor::BeginPlay()
 #pragma endregion
 
 #pragma region ACTOR TARGET MOVEMENT SETTING
-	// TArry<AProject0Actor*> AProject0Actors;
+	// TArray<AProject0Actor*> AProject0Actors;
 	// UGameplayStatics::GetAllActorsOfClass(GetWorld(), TEXT("Target"), OUT AProject0Actors);
 	// 
 	// if (AProject0Actors.Num() > 0)

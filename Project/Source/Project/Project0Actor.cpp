@@ -23,7 +23,7 @@ AProject0Actor::AProject0Actor()
 	Head->SetRelativeScale3D(FVector(0.1875f, 0.5f, 1.5f));
 
 	Wing = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Wing"));
-	Wing->SetupAttachment(Wing);
+	Wing->SetupAttachment(Box);
 	Wing->SetRelativeLocation(FVector(17.5f, 0.0f, 0.0f));
 	Wing->SetRelativeScale3D(FVector(0.25f, 3.5f, 0.5f));
 

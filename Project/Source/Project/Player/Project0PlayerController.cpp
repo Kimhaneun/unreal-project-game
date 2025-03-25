@@ -4,6 +4,7 @@
 #include "Player/Project0PlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/Character.h"	
 
 AProject0PlayerController::AProject0PlayerController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -28,6 +29,7 @@ void AProject0PlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ThisClass::InputAttack);
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ThisClass::InputMovement);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ThisClass::InputTurn);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ThisClass::InputJump);
 	}
 }
 
@@ -76,4 +78,14 @@ void AProject0PlayerController::InputTurn(const FInputActionValue& InputValue)
 	FRotator Rotation(0.0f, XValue, 0.0f);
 	GetPawn()->AddActorLocalRotation(Rotation);
 #pragma endregion
+}
+
+void AProject0PlayerController::InputJump(const FInputActionValue& InputValue)
+{
+	ACharacter* Project0Character = Cast<ACharacter>(GetPawn());
+
+	if (Project0Character)
+	{
+		Project0Character->Jump();
+	}
 }

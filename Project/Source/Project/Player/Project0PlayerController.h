@@ -27,6 +27,7 @@ private:
 	void InputAttack(const FInputActionValue& InputValue);
 	void InputMovement(const FInputActionValue& InputValue);
 	void InputTurn(const FInputActionValue& InputValue);
+	void InputJump(const FInputActionValue& InputValue);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -40,4 +41,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> TurnAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> JumpAction;
 };

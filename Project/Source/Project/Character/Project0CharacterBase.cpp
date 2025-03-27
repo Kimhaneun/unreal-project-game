@@ -27,10 +27,27 @@ AProject0CharacterBase::AProject0CharacterBase()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.f, 0.0f));
 
 	// static
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FindMeshReference(TEXT("/Script/Engine.SkeletalMesh'/Game/02Environment/Characters/Mannequins/Meshes/SKM_Quinn.SKM_Quinn'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> FindMeshReference(TEXT("/Script/Engine.SkeletalMesh'/Game/02Environment/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard'"));
 
 	if (FindMeshReference.Succeeded())
 		GetMesh()->SetSkeletalMesh(FindMeshReference.Object);
+
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRefernce(TEXT("/Script/Engine.AnimBlueprint'/Game/04Animation/ABP_Player.ABP_Player_C'"));
+	if (AnimInstanceRefernce.Succeeded())
+		GetMesh()->SetAnimInstanceClass(AnimInstanceRefernce.Class);
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontageReference(TEXT("/Script/Engine.AnimMontage'/Game/04Animation/AM_Attack.AM_Attack'"));
+	if (AttackMontageReference.Succeeded())
+	{
+		AttackMontage = AttackMontageReference.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboAttackMontageReference(TEXT("/Script/Engine.AnimBlueprint'/Game/04Animation/ABP_Player.ABP_Player'"));
+	if (ComboAttackMontageReference.Succeeded())
+	{
+		AttackMontage = ComboAttackMontageReference.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -52,5 +69,30 @@ void AProject0CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AProject0CharacterBase::ProcessAttack()
+{
+	if (GetCurrentMontage() == AttackMontage)
+		return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		int32 Index = FMath::RandRange(1, 4);
+		FString SectionName = FString::Printf(TEXT("Attack%d"), Index);
+
+		AnimInstance->Montage_Play(AttackMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName(*SectionName));
+	}
+}
+
+void AProject0CharacterBase::ProcessComboAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(ComboAttackMontage, 1.0f);
+	}
 }
 

@@ -94,7 +94,10 @@ void AProject0Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AProject0Player::InputAttack(const FInputActionValue& InputValue)
 {
-	GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Blue, TEXT("Attack"));
+	// GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Blue, TEXT("Attack"));
+	
+	// ProcessAttack();
+	ProcessComboAttack();
 }
 
 void AProject0Player::InputMovement(const FInputActionValue& InputValue)

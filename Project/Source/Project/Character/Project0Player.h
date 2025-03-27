@@ -6,14 +6,15 @@
 #include "Character/Project0CharacterBase.h"
 #include "Project0Player.generated.h"
 
+struct FInputActionValue;
 /**
- * 
+ *
  */
 UCLASS()
 class PROJECT_API AProject0Player : public AProject0CharacterBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AProject0Player();
 
@@ -24,6 +25,30 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+#pragma region INPUT SYSTEM
+private:
+	void InputAttack(const FInputActionValue& InputValue);
+	void InputMovement(const FInputActionValue& InputValue);
+	void InputTurn(const FInputActionValue& InputValue);
+	// void InputJump(const FInputActionValue& InputValue);
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputMappingContext> InputMappingContext;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> AttackAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> MovementAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> TurnAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<class UInputAction> JumpAction;
+#pragma endregion
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

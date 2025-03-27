@@ -7,7 +7,6 @@
 #include "Project0PlayerController.generated.h"
 
 struct FInputActionValue;
-
 /**
  *
  */
@@ -22,26 +21,4 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-
-private:
-	void InputAttack(const FInputActionValue& InputValue);
-	void InputMovement(const FInputActionValue& InputValue);
-	void InputTurn(const FInputActionValue& InputValue);
-	void InputJump(const FInputActionValue& InputValue);
-
-protected:
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputMappingContext> InputMappingContext;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> AttackAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> MovementAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> TurnAction;
-
-	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> JumpAction;
 };

@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/Project0AttackInterface.h"
 #include "Project0CharacterBase.generated.h"
 
 UCLASS()
-class PROJECT_API AProject0CharacterBase : public ACharacter
+class PROJECT_API AProject0CharacterBase : public ACharacter, public IProject0AttackInterface
 {
 	GENERATED_BODY()
 
@@ -35,6 +36,9 @@ public:
 
 	void SetComboCheckTimer();
 	void ComboCheck();
+
+	// IProject0AttackInterface을(를) 통해 상속됨
+	void AttackHitCheck() override;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = Attack)

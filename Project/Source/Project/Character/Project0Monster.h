@@ -22,4 +22,10 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+public:
+	virtual void SetDead() override;
+
+protected:
+	float DeadEventDelayTime = 5.0f;
 };

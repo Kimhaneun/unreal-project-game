@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Project/Character/Project0ComboAttackData.h"
+#include "Engine/DamageEvents.h"
 
 // Sets default values
 AProject0CharacterBase::AProject0CharacterBase()
@@ -51,6 +52,13 @@ AProject0CharacterBase::AProject0CharacterBase()
 		ComboAttackMontage = ComboAttackMontageReference.Object;
 	}
 
+	// Dead Montage
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageReference(TEXT("/Script/Engine.AnimMontage'/Game/04Animation/AM_Dead.AM_Dead'"));
+	if (DeadMontageReference.Succeeded())
+	{
+		DeadMontage = DeadMontageReference.Object;
+	}
+
 	// Combo Attack Data
 	static ConstructorHelpers::FObjectFinder<UProject0ComboAttackData> ComboAttackDataReference(TEXT("/Script/Project.Project0ComboAttackData'/Game/05CharacterAction/DA_ComboAttackData.DA_ComboAttackData'"));
 	if (ComboAttackDataReference.Succeeded())
@@ -78,6 +86,15 @@ void AProject0CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerIn
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+float AProject0CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	SetDead();
+
+	return DamageAmount;
 }
 
 void AProject0CharacterBase::ProcessAttack()
@@ -192,18 +209,34 @@ void AProject0CharacterBase::AttackHitCheck()
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel12, FCollisionShape::MakeSphere(AttackRadius), Params);
+	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel2, FCollisionShape::MakeSphere(AttackRadius), Params);
 
 	if (HitDetected)
 	{
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+
 		UE_LOG(LogTemp, Log, TEXT("Hello, World!"));
+	}
 
 #if ENABLE_DRAW_DEBUG
-		FVector CapsuleOrigin = Start + AttackRange * 0.5f;
-		float CapsuleHalfHeight = AttackRange * 0.5f;
-		FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 
-		DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 0.5f);
-#endif 
+	DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+#endif
+}
+
+void AProject0CharacterBase::SetDead()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(false);
+		AnimInstance->Montage_Play(DeadMontage, 1.0f);
 	}
+
+	SetActorEnableCollision(false);
 }

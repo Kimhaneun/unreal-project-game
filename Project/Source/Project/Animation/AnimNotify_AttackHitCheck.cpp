@@ -10,7 +10,7 @@ void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 	Super::Notify(MeshComp, Animation, EventReference);
 
 	// AttackHitCheck를 소유한 컴포넌트를 찾을 수 있다.
-	if (MeshComp->GetOwner())
+	if (MeshComp)
 	{
 		// C++의 인터페이스
 		// virtual void 함수() = 0;

@@ -27,6 +27,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 public:
 	virtual void ProcessAttack();
 	virtual void ProcessComboAttack();
@@ -40,12 +42,17 @@ public:
 	// IProject0AttackInterface을(를) 통해 상속됨
 	void AttackHitCheck() override;
 
+	virtual void SetDead();
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Attack)
 	TObjectPtr<class UAnimMontage> AttackMontage;
 
 	UPROPERTY(EditAnywhere, Category = Attack)
 	TObjectPtr<class UAnimMontage> ComboAttackMontage;
+
+	UPROPERTY(EditAnywhere, Category = Attack)
+	TObjectPtr<class UAnimMontage> DeadMontage;
 
 	UPROPERTY(EditAnywhere, Category = Attack)
 	TObjectPtr<class  UProject0ComboAttackData> ComboAttackData;

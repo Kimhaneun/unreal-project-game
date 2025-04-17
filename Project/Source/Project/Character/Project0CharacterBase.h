@@ -33,8 +33,8 @@ public:
 	virtual void ProcessAttack();
 	virtual void ProcessComboAttack();
 
-	void ComboAttackBegin();
-	void ComboAttackEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void ComboAttackBegin();
+	virtual void ComboAttackEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 
 	void SetComboCheckTimer();
 	void ComboCheck();

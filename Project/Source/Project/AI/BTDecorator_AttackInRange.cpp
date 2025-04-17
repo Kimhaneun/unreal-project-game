@@ -4,6 +4,7 @@
 #include "AI/BTDecorator_AttackInRange.h"
 #include "AI/Project0AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Interface/Project0AIInterface.h"
 
 UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
 {
@@ -22,6 +23,12 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	if (TargetPawn == nullptr)
 	{
 		return false;
+	}
+
+	IProject0AIInterface* Project0AIPawn = Cast< IProject0AIInterface>(Pawn);
+	if (Project0AIPawn)
+	{
+		return (Pawn)->GetDistanceTo(TargetPawn)<= Project0AIPawn->GetAttackRange();
 	}
 
 	return (Pawn->GetDistanceTo(TargetPawn) <= AttackRange);

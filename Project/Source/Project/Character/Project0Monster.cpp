@@ -3,12 +3,15 @@
 
 #include "Character/Project0Monster.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Project/AI/Project0AIController.h"
 
 AProject0Monster::AProject0Monster()
 {
 	AIControllerClass = AProject0AIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Project0Monster"));
 

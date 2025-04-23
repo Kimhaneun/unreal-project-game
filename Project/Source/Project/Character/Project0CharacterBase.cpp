@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Project/Character/Project0ComboAttackData.h"
 #include "Engine/DamageEvents.h"
+#include "CharacterStat/project0CharacterComponent.h"
 
 // Sets default values
 AProject0CharacterBase::AProject0CharacterBase()
@@ -33,11 +34,15 @@ AProject0CharacterBase::AProject0CharacterBase()
 
 	if (FindMeshReference.Succeeded())
 		GetMesh()->SetSkeletalMesh(FindMeshReference.Object);
-
+					
+	// Animation
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRefernce(TEXT("/Script/Engine.AnimBlueprint'/Game/04Animation/ABP_Player.ABP_Player_C'"));
 	if (AnimInstanceRefernce.Succeeded())
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRefernce.Class);
+
+	// Stat component
+	StatComponent = CreateDefaultSubobject<UProject0CharacterComponent>(TEXT("Stat"));
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontageReference(TEXT("/Script/Engine.AnimMontage'/Game/04Animation/AM_Attack.AM_Attack'"));
 	if (AttackMontageReference.Succeeded())
@@ -71,7 +76,15 @@ AProject0CharacterBase::AProject0CharacterBase()
 void AProject0CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	StatComponent->OnHpZeroDelegate.AddUObject(this, &AProject0CharacterBase::SetDead);
+}
 
+void AProject0CharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	StatComponent->OnHpZeroDelegate.AddUObject(this, &AProject0CharacterBase::SetDead);
+	StatComponent->OnStatChangedDelegage.AddUObject(this, &AProject0CharacterBase::ApplyStat);
 }
 
 // Called every frame
@@ -92,7 +105,7 @@ float AProject0CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const&
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	SetDead();
+	StatComponent->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
 }
@@ -146,7 +159,7 @@ void AProject0CharacterBase::ComboAttackBegin()
 	// Combo Attack Start
 	CurrentCombo = 1;
 
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = StatComponent->GetTotalStat().AttackSpeed;
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(ComboAttackMontage, AttackSpeedRate);
 
@@ -169,7 +182,7 @@ void AProject0CharacterBase::SetComboCheckTimer()
 {
 	int32 ComboIndex = CurrentCombo - 1;
 
-	const float AttackSpeedRate = 1.0f;
+	const float AttackSpeedRate = StatComponent->GetTotalStat().AttackSpeed;;
 	float ComboEffectiveTime = (ComboAttackData->EffectiveFrameCount[ComboIndex] / ComboAttackData->FrameRate) / AttackSpeedRate;
 
 	if (ComboEffectiveTime > 0.0f)
@@ -202,9 +215,9 @@ void AProject0CharacterBase::AttackHitCheck()
 	FHitResult OutHitResult;
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	const float AttackRange = 40.0f;
-	const float AttackRadius = 50.0f;
-	const float AttackDamage = 30.0f;
+	const float AttackRange = StatComponent->GetTotalStat().AttackRange;
+	const float AttackRadius = StatComponent->GetTotalStat().AttackRadius;
+	const float AttackDamage = StatComponent->GetTotalStat().Attack;
 
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -239,4 +252,10 @@ void AProject0CharacterBase::SetDead()
 	}
 
 	SetActorEnableCollision(false);
+}
+
+void AProject0CharacterBase::ApplyStat(const FProject0CharacterStat& BaseStat, const FProject0CharacterStat& ModifierStat)
+{
+	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
 }

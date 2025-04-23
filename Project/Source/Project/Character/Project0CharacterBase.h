@@ -7,6 +7,8 @@
 #include "Interface/Project0AttackInterface.h"
 #include "Project0CharacterBase.generated.h"
 
+struct FProject0CharacterStat;
+
 UCLASS()
 class PROJECT_API AProject0CharacterBase : public ACharacter, public IProject0AttackInterface
 {
@@ -19,8 +21,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -44,6 +47,9 @@ public:
 
 	virtual void SetDead();
 
+	void ApplyStat(const FProject0CharacterStat& BaseStat, const FProject0CharacterStat& ModifierStat);
+	FORCEINLINE TObjectPtr<class UProject0CharacterComponent> GetStatComponent() { return StatComponent; }
+
 protected:
 	UPROPERTY(EditAnywhere, Category = Attack)
 	TObjectPtr<class UAnimMontage> AttackMontage;
@@ -61,4 +67,8 @@ protected:
 
 	FTimerHandle ComboTimerHandle;
 	bool HasNextComboCommand = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UProject0CharacterComponent> StatComponent;
+
 };

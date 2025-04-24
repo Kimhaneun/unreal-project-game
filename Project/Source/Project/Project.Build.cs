@@ -13,7 +13,7 @@ public class Project : ModuleRules
         PublicIncludePaths.AddRange(new string[] { "Project" });
         #endregion
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" , "NavigationSystem", "AIModule", "GameplayTasks"});
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" , "NavigationSystem", "AIModule", "GameplayTasks", "UMG" });
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
 

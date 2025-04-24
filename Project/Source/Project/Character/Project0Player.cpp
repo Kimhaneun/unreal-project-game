@@ -7,6 +7,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "GameData/Project0CharacterStat.h"
+#include "CharacterStat/Project0CharacterComponent.h"
+#include "UI/Project0PlayerHUDWidget.h"
 
 AProject0Player::AProject0Player()
 {
@@ -24,6 +27,13 @@ AProject0Player::AProject0Player()
 	Camera->SetupAttachment(SpringArm);
 
 	Camera->bUsePawnControlRotation = false;
+
+	// Player HUD Widget
+	static ConstructorHelpers::FClassFinder<UProject0PlayerHUDWidget> PlayerHUDWidgetClassRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_PlayerHUD.WBP_PlayerHUD_C'"));
+	if (PlayerHUDWidgetClassRef.Succeeded())
+	{
+		PlayerHUDWidgetClass = PlayerHUDWidgetClassRef.Class;
+	}
 
 	struct ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCDefaultRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/03Input/IMC_Default.IMC_Default'"));
 	if (IMCDefaultRef.Succeeded())
@@ -69,6 +79,21 @@ void AProject0Player::BeginPlay()
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
+	PlayerHUDWidget = CreateWidget<UProject0PlayerHUDWidget>(PlayerController, PlayerHUDWidgetClass);
+	if (PlayerHUDWidget)
+	{
+		PlayerHUDWidget->AddToViewport();
+	}
+
+	if (PlayerHUDWidget && StatComponent)
+	{
+		PlayerHUDWidget->UpdateStat(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		PlayerHUDWidget->UpdateHP(StatComponent->GetCurrentHP());
+
+		StatComponent->OnHpChangedDelegate.AddUObject(PlayerHUDWidget, &UProject0PlayerHUDWidget::UpdateHP);
+		StatComponent->OnStatChangedDelegage.AddUObject(PlayerHUDWidget, &UProject0PlayerHUDWidget::UpdateStat);
+	}
 }
 
 void AProject0Player::Tick(float DeltaTime)
@@ -86,7 +111,7 @@ void AProject0Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AProject0Player::InputAttack);
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &AProject0Player::InputMovement);
 		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &AProject0Player::InputTurn);
-		
+
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AProject0Player::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AProject0Player::StopJumping);
 	}
@@ -95,7 +120,7 @@ void AProject0Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AProject0Player::InputAttack(const FInputActionValue& InputValue)
 {
 	// GEngine->AddOnScreenDebugMessage(0, 1.0f, FColor::Blue, TEXT("Attack"));
-	
+
 	// ProcessAttack();
 	ProcessComboAttack();
 }

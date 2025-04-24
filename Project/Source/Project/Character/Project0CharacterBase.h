@@ -71,4 +71,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UProject0CharacterComponent> StatComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UWidgetComponent> HPBarWidgetComponent;
+
+	// UWidgetComoponent
 };

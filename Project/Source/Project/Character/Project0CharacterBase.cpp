@@ -7,6 +7,8 @@
 #include "Project/Character/Project0ComboAttackData.h"
 #include "Engine/DamageEvents.h"
 #include "CharacterStat/project0CharacterComponent.h"
+#include "Components/WidgetComponent.h"
+#include "UI/Project0HPBarWidget.h"
 
 // Sets default values
 AProject0CharacterBase::AProject0CharacterBase()
@@ -43,6 +45,20 @@ AProject0CharacterBase::AProject0CharacterBase()
 
 	// Stat component
 	StatComponent = CreateDefaultSubobject<UProject0CharacterComponent>(TEXT("Stat"));
+
+	// HP Bar Widget Component
+	HPBarWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarWidget"));
+	HPBarWidgetComponent->SetupAttachment(GetRootComponent());
+	HPBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 90.0f));
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetReference(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/WBP_HPBar.WBP_HPBar_C'"));
+	if (HPBarWidgetReference.Succeeded())
+	{
+		HPBarWidgetComponent->SetWidgetClass(HPBarWidgetReference.Class);
+		HPBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		HPBarWidgetComponent->SetDrawSize(FVector2D(150.0f, 15.0f));
+		HPBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontageReference(TEXT("/Script/Engine.AnimMontage'/Game/04Animation/AM_Attack.AM_Attack'"));
 	if (AttackMontageReference.Succeeded())
@@ -85,6 +101,22 @@ void AProject0CharacterBase::PostInitializeComponents()
 
 	StatComponent->OnHpZeroDelegate.AddUObject(this, &AProject0CharacterBase::SetDead);
 	StatComponent->OnStatChangedDelegage.AddUObject(this, &AProject0CharacterBase::ApplyStat);
+
+	if (HPBarWidgetComponent == nullptr)
+	{
+		return;
+	}
+
+	HPBarWidgetComponent->InitWidget();
+	UProject0HPBarWidget* HPBarWidget = Cast<UProject0HPBarWidget>(HPBarWidgetComponent->GetUserWidgetObject());
+	if (HPBarWidget)
+	{
+		HPBarWidget->UpdateStat(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		HPBarWidget->UpdateHP(StatComponent->GetCurrentHP());
+
+		StatComponent->OnHpChangedDelegate.AddUObject(HPBarWidget, &UProject0HPBarWidget::UpdateHP);
+		StatComponent->OnStatChangedDelegage.AddUObject(HPBarWidget, &UProject0HPBarWidget::UpdateStat);
+	}
 }
 
 // Called every frame
@@ -252,6 +284,8 @@ void AProject0CharacterBase::SetDead()
 	}
 
 	SetActorEnableCollision(false);
+
+	HPBarWidgetComponent->SetVisibility(false);
 }
 
 void AProject0CharacterBase::ApplyStat(const FProject0CharacterStat& BaseStat, const FProject0CharacterStat& ModifierStat)

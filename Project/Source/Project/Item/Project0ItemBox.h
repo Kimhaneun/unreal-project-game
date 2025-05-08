@@ -15,6 +15,10 @@ public:
 	// Sets default values for this actor's properties
 	AProject0ItemBox();
 
+protected:
+	// PostInitializeComponents(): Awake()함수와 같은 동작을 한다.
+	virtual void PostInitializeComponents() override;
+
 public:
 	UFUNCTION()
 	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -31,5 +35,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UParticleSystemComponent> Effect;
+
+	// 최소 단위를 가져야 확장성이 높다.
+	UPROPERTY(EditAnywhere, Category = Item)
+	TObjectPtr<class UProject0ItemData> ItemData;
 
 };

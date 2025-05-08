@@ -4,13 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/Project0ItemInterface.h"
 #include "Interface/Project0AttackInterface.h"
+#include "Item/Project0ItemData.h"
 #include "Project0CharacterBase.generated.h"
 
 struct FProject0CharacterStat;
 
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, class UProject0ItemData* /*InItemData*/)
+
 UCLASS()
-class PROJECT_API AProject0CharacterBase : public ACharacter, public IProject0AttackInterface
+class PROJECT_API AProject0CharacterBase : public ACharacter, public IProject0AttackInterface, public IProject0ItemInterface
 {
 	GENERATED_BODY()
 
@@ -48,7 +52,18 @@ public:
 	virtual void SetDead();
 
 	void ApplyStat(const FProject0CharacterStat& BaseStat, const FProject0CharacterStat& ModifierStat);
-	FORCEINLINE TObjectPtr<class UProject0CharacterComponent> GetStatComponent() { return StatComponent; }
+
+	// Inherited via IProject0ItemInterface
+	virtual void TakeItem(UProject0ItemData* InItemData) override;
+	virtual void EquipWeapon(UProject0ItemData* InItemData);
+	virtual void DrinkPotion(UProject0ItemData* InItemData);
+	virtual void ReadScroll(UProject0ItemData* InItemData);
+
+protected:
+	TMap<EItemType, FOnTakeItemDelegate> TakeItemActions;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USkeletalMeshComponent> WeaponComponent;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = Attack)
@@ -74,5 +89,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UWidgetComponent> HPBarWidgetComponent;
 
-	// UWidgetComoponent
 };

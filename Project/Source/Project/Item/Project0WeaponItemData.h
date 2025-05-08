@@ -23,7 +23,9 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	TObjectPtr<class USkeletalMesh> WeaponMesh;
+	// 하드 레퍼런싱에서 소프트 레퍼런싱으로 변경한다
+	TSoftObjectPtr<class USkeletalMesh> WeaponMesh;
+	// TObjectPtr<class USkeletalMesh> WeaponMesh;
 
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	FProject0CharacterStat ModifierStat;

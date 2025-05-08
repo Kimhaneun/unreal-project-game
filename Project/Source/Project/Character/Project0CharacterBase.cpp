@@ -9,6 +9,9 @@
 #include "CharacterStat/project0CharacterComponent.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Project0HPBarWidget.h"
+#include "Item/Project0PotionItemData.h"
+#include "Item/Project0ScrollItemData.h"
+#include "Item/Project0WeaponItemData.h"
 
 // Sets default values
 AProject0CharacterBase::AProject0CharacterBase()
@@ -42,6 +45,10 @@ AProject0CharacterBase::AProject0CharacterBase()
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRefernce(TEXT("/Script/Engine.AnimBlueprint'/Game/04Animation/ABP_Player.ABP_Player_C'"));
 	if (AnimInstanceRefernce.Succeeded())
 		GetMesh()->SetAnimInstanceClass(AnimInstanceRefernce.Class);
+
+	// WeaponComponent
+	 WeaponComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	 WeaponComponent->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
 
 	// Stat component
 	StatComponent = CreateDefaultSubobject<UProject0CharacterComponent>(TEXT("Stat"));
@@ -86,6 +93,11 @@ AProject0CharacterBase::AProject0CharacterBase()
 	{
 		ComboAttackData = ComboAttackDataReference.Object;
 	}
+
+	// Item Actions
+	TakeItemActions.Add(EItemType::Potion, FOnTakeItemDelegate::CreateUObject(this, &AProject0CharacterBase::DrinkPotion));
+	TakeItemActions.Add(EItemType::Scroll, FOnTakeItemDelegate::CreateUObject(this, &AProject0CharacterBase::ReadScroll));
+	TakeItemActions.Add(EItemType::Weapon, FOnTakeItemDelegate::CreateUObject(this, &AProject0CharacterBase::EquipWeapon));
 }
 
 // Called when the game starts or when spawned
@@ -292,4 +304,65 @@ void AProject0CharacterBase::ApplyStat(const FProject0CharacterStat& BaseStat, c
 {
 	float MovementSpeed = (BaseStat + ModifierStat).MovementSpeed;
 	GetCharacterMovement()->MaxWalkSpeed = MovementSpeed;
+}
+
+void AProject0CharacterBase::TakeItem(UProject0ItemData* InItemData)
+{
+	if (InItemData)
+	{
+		TakeItemActions[InItemData->Type].ExecuteIfBound(InItemData);
+	}
+}
+
+void AProject0CharacterBase::DrinkPotion(UProject0ItemData* InItemData)
+{
+	UE_LOG(LogTemp, Log, TEXT("DrinkPotion"));
+
+	// 리케스팅 작업(형 변환)
+	UProject0PotionItemData* PotionItemData = Cast<UProject0PotionItemData>(InItemData);
+	if (PotionItemData)
+	{
+		if (StatComponent)
+		{
+			StatComponent->SetHP(StatComponent->GetCurrentHP() + PotionItemData->HealAmount);
+		}
+	}
+}
+
+void AProject0CharacterBase::EquipWeapon(UProject0ItemData* InItemData)
+{
+	UE_LOG(LogTemp, Log, TEXT("EquipWeapon"));
+
+	UProject0WeaponItemData* WeaponItemData = Cast<UProject0WeaponItemData>(InItemData);
+	if (WeaponItemData)
+	{
+		if (WeaponItemData->WeaponMesh.IsPending())
+		{
+			WeaponItemData->WeaponMesh.LoadSynchronous();
+		}
+
+		if (WeaponComponent)
+		{
+			WeaponComponent->SetSkeletalMesh(WeaponItemData->WeaponMesh.Get());
+		}
+
+		if (StatComponent)
+		{
+			StatComponent->SetModifierStat(WeaponItemData->ModifierStat);
+		}
+	}
+}
+
+void AProject0CharacterBase::ReadScroll(UProject0ItemData* InItemData)
+{
+	UE_LOG(LogTemp, Log, TEXT("ReadScroll"));
+
+	UProject0ScrollItemData* ScrollItemData = Cast<UProject0ScrollItemData>(InItemData);
+	if (ScrollItemData)
+	{
+		if (StatComponent)
+		{
+			StatComponent->AddBaseStat(ScrollItemData->BaseStat);
+		}
+	}
 }

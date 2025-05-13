@@ -59,6 +59,10 @@ public:
 	virtual void DrinkPotion(UProject0ItemData* InItemData);
 	virtual void ReadScroll(UProject0ItemData* InItemData);
 
+public:
+	int32 GetLevel();
+	void SetLevel(int32 InNewLevel);
+
 protected:
 	TMap<EItemType, FOnTakeItemDelegate> TakeItemActions;
 

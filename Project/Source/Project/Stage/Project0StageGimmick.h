@@ -75,4 +75,51 @@ protected:
 	TMap<EStageState, FOnStateChangedDelegate> StateChangedDelegates;
 #pragma endregion
 
+#pragma region FIGHT_STATE
+public:
+	UFUNCTION()
+	void OnMonsterSpawn();
+
+	// 언리얼에는 몬스터가 삭제되었을 때 호출되는 델리게이트가 이미 존재한다(!!!).
+	UFUNCTION()
+	void OnMonsterDestroyed(AActor* DestroyedActor);
+
+protected:
+	UPROPERTY(EditAnywhere, Category = Fight)
+	TSubclassOf<class AProject0Monster> MonsterClass;
+
+	UPROPERTY(EditAnywhere, Category = Fight)
+	float MonsterSpawnTime = 2.0f;
+
+	FTimerHandle MonsterSpawnTimerHandle;
+
+#pragma endregion
+
+#pragma region REWARD_STATE
+public:
+	UFUNCTION()
+	void SpawnRewardBoxes();
+
+	UFUNCTION()
+	void OnRewardBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Reward)
+	TArray<TWeakObjectPtr<class AProject0ItemBox>> RewardBoxes;
+
+	TMap<FName, FVector> RewardBoxLocations;
+
+#pragma endregion
+
+#pragma region STAGE_STAT
+public:
+	FORCEINLINE int32 GetStageLevel() { return CurrentStageLevel; }
+	FORCEINLINE void SetStageLevel(int32 NewStageLevel) { CurrentStageLevel = NewStageLevel; }
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = Stage)
+	int32 CurrentStageLevel = 0;
+
+#pragma endregion
+
 };

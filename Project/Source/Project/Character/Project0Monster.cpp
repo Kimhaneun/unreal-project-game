@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Project/AI/Project0AIController.h"
+#include "Engine/AssetManager.h"
 
 AProject0Monster::AProject0Monster()
 {
@@ -16,17 +17,30 @@ AProject0Monster::AProject0Monster()
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Project0Monster"));
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/02Environment/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard'"));
+	GetMesh()->SetHiddenInGame(true);
 
-	if (MeshRef.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(MeshRef.Object);
-	}
+	// 이제 다양한 종류의 몬스터를 생성하므로 제거한다.
+	// static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/02Environment/InfinityBladeWarriors/Character/CompleteCharacters/SK_CharM_Cardboard.SK_CharM_Cardboard'"));
+	// 
+	// if (MeshRef.Succeeded())
+	// {
+	// 	GetMesh()->SetSkeletalMesh(MeshRef.Object);
+	// }
 }
 
 void AProject0Monster::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AProject0Monster::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	ensure(MonsterMeshes.Num() > 0);
+	int32 RandomIndex = FMath::RandRange(0, MonsterMeshes.Num() - 1);
+
+	MonsterMeshHandle = UAssetManager::Get().GetStreamableManager().RequestAsyncLoad(MonsterMeshes[RandomIndex], FStreamableDelegate::CreateUObject(this, &AProject0Monster::MonsterMeshLoadComplete));
 }
 
 void AProject0Monster::Tick(float DeltaTime)
@@ -69,4 +83,19 @@ void AProject0Monster::ComboAttackEnd(UAnimMontage* TargetMontage, bool IsProper
 void AProject0Monster::SetAIAttackFinishedDelegate(const FAIAttackFinished& InOnAttackFinished)
 {
 	OnAttackFinished = InOnAttackFinished;
+}
+
+void AProject0Monster::MonsterMeshLoadComplete()
+{
+	if (MonsterMeshHandle.IsValid())
+	{
+		USkeletalMesh* MonsterMesh = Cast<USkeletalMesh>(MonsterMeshHandle->GetLoadedAsset());
+		if (MonsterMesh)
+		{
+			GetMesh()->SetSkeletalMesh(MonsterMesh);
+			GetMesh()->SetHiddenInGame(false);
+		}
+	}
+
+	MonsterMeshHandle->ReleaseHandle();
 }

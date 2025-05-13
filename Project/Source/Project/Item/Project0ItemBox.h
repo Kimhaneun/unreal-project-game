@@ -26,6 +26,9 @@ public:
 	UFUNCTION()
 	void OnBoxEffectFinished(class UParticleSystemComponent* PSystem);
 
+public:
+	TObjectPtr<class UBoxComponent> GetTriggerBox() const { return TriggerBox; }
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UBoxComponent> TriggerBox;

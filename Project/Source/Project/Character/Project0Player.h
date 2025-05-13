@@ -26,6 +26,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	virtual void SetDead() override;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly,Category = HUD)
 	TSubclassOf<class UProject0PlayerHUDWidget> PlayerHUDWidgetClass;

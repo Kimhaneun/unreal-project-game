@@ -78,6 +78,8 @@ void AProject0Player::BeginPlay()
 		{
 			Subsystem->AddMappingContext(InputMappingContext, 0);
 		}
+
+		EnableInput(PlayerController);
 	}
 
 	PlayerHUDWidget = CreateWidget<UProject0PlayerHUDWidget>(PlayerController, PlayerHUDWidgetClass);
@@ -115,6 +117,14 @@ void AProject0Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AProject0Player::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AProject0Player::StopJumping);
 	}
+}
+
+void AProject0Player::SetDead()
+{
+	Super::SetDead();
+
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	DisableInput(PlayerController);
 }
 
 void AProject0Player::InputAttack(const FInputActionValue& InputValue)

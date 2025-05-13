@@ -366,3 +366,13 @@ void AProject0CharacterBase::ReadScroll(UProject0ItemData* InItemData)
 		}
 	}
 }
+
+int32 AProject0CharacterBase::GetLevel()
+{
+	return StatComponent->GetCurretLevel();
+}
+
+void AProject0CharacterBase::SetLevel(int32 InNewLevel)
+{
+	StatComponent->SetLevel(InNewLevel);
+}

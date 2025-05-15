@@ -10,6 +10,8 @@
 #include "GameData/Project0CharacterStat.h"
 #include "CharacterStat/Project0CharacterComponent.h"
 #include "UI/Project0PlayerHUDWidget.h"
+#include "GameFramework/GameModeBase.h"
+#include "Interface/Project0GameInterface.h"
 
 AProject0Player::AProject0Player()
 {
@@ -124,7 +126,16 @@ void AProject0Player::SetDead()
 	Super::SetDead();
 
 	APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	DisableInput(PlayerController);
+	if (PlayerController)
+	{
+		DisableInput(PlayerController);
+	}
+
+	IProject0GameInterface* Project0GameMode = Cast<IProject0GameInterface>(GetWorld()->GetAuthGameMode());
+	if (Project0GameMode)
+	{
+		Project0GameMode->OnPlayerDead();
+	}
 }
 
 void AProject0Player::InputAttack(const FInputActionValue& InputValue)

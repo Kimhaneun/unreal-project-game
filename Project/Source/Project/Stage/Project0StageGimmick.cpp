@@ -7,6 +7,8 @@
 #include "Engine/OverlapResult.h"
 #include "Character/Project0Monster.h"
 #include "Item/Project0ItemBox.h"
+#include "GameFramework/GameModeBase.h"
+#include "Interface/Project0GameInterface.h"
 
 // Sets default values
 AProject0StageGimmick::AProject0StageGimmick()
@@ -217,6 +219,18 @@ void AProject0StageGimmick::OnMonsterSpawn()
 
 void AProject0StageGimmick::OnMonsterDestroyed(AActor* DestroyedActor)
 {
+	// 몬스터가 사라지고 난 후, 점수를 추가한다.
+	IProject0GameInterface* Project0GameMode = Cast<IProject0GameInterface>(GetWorld()->GetAuthGameMode());
+	if (Project0GameMode)
+	{
+		Project0GameMode->AddPlayerScore(1);
+
+		if (Project0GameMode->IsGameCleared())
+		{
+			return;
+		}
+	}
+
 	// 몬스터가 죽으면 실행되는 함수
 	SetState(EStageState::Reward);
 }

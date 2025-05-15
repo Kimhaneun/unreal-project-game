@@ -21,4 +21,28 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+
+public:
+	// BlueprintImplementableEvent: 추상(abstract)
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnScoreChangedCpp"))
+	void K2_OnScoreChanged(int32 NewScore);
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnGameClearCpp"))
+	void K2_OnGameClear();
+
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnGameOverCpp"))
+	void K2_OnGameOver();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Game", meta = (DisplayName = "OnGameRetryCountCpp"))
+	void K2_OnGameRetryCount(int32 NewRetryCount);
+
+public:
+	void GameScoreChanged(int32 NewScore);
+	void GameClear();
+	void GameOver();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SaveGame)
+	TObjectPtr< class UProject0SaveGame> SaveGameInstance;
+
 };

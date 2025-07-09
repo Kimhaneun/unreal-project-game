@@ -12,7 +12,7 @@
 
 <br>
 
-- 2025 Third year first semester class project.
+- 2025 Third year first semester subject project.
 - Game of defeating monsters in  dungeon.
 - A game that wins and strengthens rewards.
 
